@@ -1,0 +1,37 @@
+[build]
+  publish = "."
+
+# Helper redirects to ensure "Clean URLs" work as expected
+# even if Pretty URLs are toggled or behave differently.
+
+[[redirects]]
+  from = "/pages/products"
+  to = "/pages/products.html"
+  status = 200
+
+[[redirects]]
+  from = "/pages/about"
+  to = "/pages/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/pages/education"
+  to = "/pages/education.html"
+  status = 200
+
+[[redirects]]
+  from = "/pages/contact"
+  to = "/pages/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/pages/news"
+  to = "/pages/news.html"
+  status = 200
+
+# Fallback for root
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 
 <head>
@@ -10,7 +10,22 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css?v=2">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <style>
+        /* Fix mobile map layout order */
+        @media (max-width: 768px) {
+
+            /* Override general grid order - ensure map first, panel second */
+            #map-section .grid-2-cols>div:first-child {
+                order: 1 !important;
+            }
+
+            #map-section .grid-2-cols>div:nth-child(2),
+            #map-section #distributor-info {
+                order: 2 !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -19,12 +34,33 @@
         <div class="container">
             <nav>
                 <a href="index.html" class="logo">Shot<span style="color:var(--color-gold)">.</span></a>
-                <div class="menu-toggle" id="mobile-menu"
-                    onclick="document.querySelector('.nav-links').classList.toggle('active')">☰</div>
+                <div class="menu-toggle" id="mobile-menu" style="cursor: pointer; z-index: 10005;">&#9776;</div>
                 <ul class="nav-links">
                     <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="pages/about.html">O Nas</a></li>
-                    <li><a href="pages/products.html">Produkty</a></li>
+                    <li class="dropdown">
+                        <a href="pages/products.html" class="dropdown-toggle">Produkty</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/pages/products?cat=koloryzacja">Koloryzacja</a></li>
+                            <li><a href="/pages/products?cat=rozjasnianie">Rozjaśnianie</a></li>
+                            <li class="has-submenu">
+                                <a href="/pages/products?cat=pielegnacja">Pielęgnacja</a>
+                                <ul class="submenu">
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=0">Color Care</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=1">Simply Blond</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=2">Anti-Age</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=3">Anti-Stress</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=4">Texturizing</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=5">Tricoilogy</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=6">Sun</a></li>
+                                    <li><a href="/pages/products?cat=pielegnacja&sub=7">Repara</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="/pages/products?cat=zabiegi-kuracje">Zabiegi</a></li>
+                            <li><a href="/pages/products?cat=techniczne">Techniczne</a></li>
+                            <li><a href="/pages/products?cat=stylizacja">Stylizacja</a></li>
+                        </ul>
+                    </li>
                     <li><a href="pages/education.html">Edukacja</a></li>
                     <li><a href="pages/news.html">Świat Shot</a></li>
                     <li><a href="pages/contact.html">Kontakt</a></li>
@@ -35,7 +71,7 @@
 
     <main>
         <section class="hero"
-            style="background: url('assets/images/hero_woman.png') center top/cover no-repeat fixed; margin-bottom: 0;">
+            style="background: url('assets/images/hero-model.jpg') center top/cover no-repeat; margin-bottom: 0;">
             <div class="hero-overlay"></div>
             <div class="container hero-content">
                 <span class="text-uppercase"
@@ -44,7 +80,7 @@
                 <h1 style="color: white; margin-bottom: 1.5rem;">Włoska Perfekcja<br>w Twoim Salonie</h1>
                 <p
                     style="font-size: 1.2rem; margin-bottom: 3rem; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto;">
-                    Odkryj luksusową pielęgnację i koloryzację, która łączy naturę z zaawansowaną technologią.
+                    Odkryj luksusową pielęgnację i koloryzacją, która łączy naturę z zaawansowaną technologią.
                 </p>
                 <div style="display: flex; gap: 1.5rem; justify-content: center;">
                     <a href="pages/products.html" class="btn btn-primary"
@@ -64,11 +100,13 @@
                         style="color: var(--color-gold); display: block; margin-bottom: 1rem;">Filozofia Marki</span>
                     <h2 style="margin-bottom: 2rem;">Innowacja Spotyka Tradycję</h2>
                     <p style="color: var(--color-text-light); margin-bottom: 2rem; font-size: 1.1rem;">
-                        Marka Shot to synonim włoskiej doskonałości. Tworzymy kosmetyki, które nie tylko pielęgnują, ale
+                        Marka Shot to synonim włoskiej doskonałości. Tworzymy kosmetyki, które nie tylko
+                        pielęgnują, ale
                         transformują włosy, dając kobietom pewność siebie każdego dnia.
                     </p>
                     <p style="color: var(--color-text-light); font-size: 1.1rem; margin-bottom: 3rem;">
-                        Nasze laboratoria we Włoszech łączą najczystsze składniki aktywne z nowoczesną technologią,
+                        Nasze laboratoria we Włoszech łączą najczystsze składniki aktywne z nowoczesną
+                        technologią,
                         tworząc formuły bezpieczne i skuteczne.
                     </p>
                     <a href="pages/about.html"
@@ -161,7 +199,8 @@
                         <span class="text-uppercase"
                             style="color: var(--color-purple); font-weight: 700; font-size: 0.7rem;">NOWOŚĆ</span>
                         <h4 style="margin: 0.5rem 0;">Premiera linii DNA</h4>
-                        <p style="color: var(--color-text-light); font-size: 0.9rem;">Nowa era koloryzacji już dostępna.
+                        <p style="color: var(--color-text-light); font-size: 0.9rem;">Nowa era koloryzacji już
+                            dostępna.
                         </p>
                     </div>
                 </a>
@@ -190,16 +229,53 @@
             </div>
         </section>
 
-        <section class="container" style="margin-top: 6rem; margin-bottom: 6rem;">
+        <section id="map-section" class="container" style="padding-top: 3rem; margin-top: 6rem; margin-bottom: 6rem;">
             <div class="text-center" style="margin-bottom: 3rem;">
-                <h5 class="text-uppercase" style="color: var(--color-purple);">Dystrybucja</h5>
-                <h2>Znajdź Dystrybutora w Twoim Regionie</h2>
+                <h2 style="color: var(--color-purple-dark); margin-bottom: 0.5rem;">Skontaktuj się z nami</h2>
+                <p style="color: var(--color-text-light);">Jesteśmy tu, aby pomóc!</p>
             </div>
 
-            <div class="card grid-2-cols" style="gap: 2rem; border: none; align-items: start;">
+            <!-- Main Distributor Box -->
+            <div
+                style="background: linear-gradient(135deg, var(--color-purple-dark) 0%, var(--color-purple) 100%); padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); margin-bottom: 3rem; color: white;">
+                <div style="text-align: center;">
+                    <h5
+                        style="text-transform: uppercase; color: var(--color-gold); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1rem;">
+                        Główny Dystrybutor</h5>
+                    <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-gold);">
+                        HAIR PASSION</h3>
+                    <p style="margin-bottom: 2rem; opacity: 0.9;">Ul. Dworcowa 60<br>44-100 Gliwice</p>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: left; max-width: 600px; margin: 0 auto;">
+                        <div>
+                            <div
+                                style="font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; color: var(--color-gold);">
+                                Telefon</div>
+                            <div style="font-size: 1.1rem; line-height: 1.6;">
+                                <a href="tel:+48605826444"
+                                    style="color: white; text-decoration: none; display: block;">+48 605 826 444</a>
+                                <a href="tel:+48323076275"
+                                    style="color: white; text-decoration: none; display: block;">+48 32 307 62 75</a>
+                            </div>
+                        </div>
+                        <div>
+                            <div
+                                style="font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; color: var(--color-gold);">
+                                E-mail</div>
+                            <div style="font-size: 1.1rem;">
+                                <a href="mailto:bok@shothair.pl"
+                                    style="color: white; text-decoration: none;">bok@shothair.pl</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2-cols" style="gap: 2rem; border: none; align-items: start;">
                 <!-- Map Container -->
                 <div style="position: relative;">
-                    <!-- TU WKLEJ CAŁY KOD SVG Z PLIKU contact.html -->
+                    <!-- TU WKLEJ CAÄąÂY KOD SVG Z PLIKU contact.html -->
                     <!-- Zastąp poniższy div kodem <svg>...</svg> -->
                     <svg class="map" id="map" baseprofile="tiny" fill="#7c7c7c" stroke="#ffffff" stroke-linecap="round"
                         stroke-linejoin="round" stroke-width="2" version="1.2" viewBox="0 0 1000 950"
@@ -277,7 +353,7 @@
                 </div>
 
                 <!-- Info Panel -->
-                <div id="distributor-info" style="
+                <div id="distributor-info" class="info-panel" style="
                     background: #fff; 
                     padding: 3rem; 
                     border-radius: 8px; 
@@ -287,36 +363,9 @@
                     justify-content: center;
                     min-height: 400px;
                 ">
-                    <h3 id="dist-region" style="color: var(--color-purple); margin-bottom: 2rem; font-size: 2rem;">
-                        Wybierz region</h3>
-
-                    <div style="display: flex; gap: 2rem; align-items: start;">
-                        <!-- Photo Placeholder -->
-                        <div
-                            style="width: 100px; height: 100px; background: #eee; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                            <img id="dist-photo" src="assets/images/educator1.png"
-                                style="width: 100%; height: 100%; object-fit: cover; opacity: 0.5;" alt="Agent">
-                        </div>
-
-                        <div>
-                            <div style="margin-bottom: 1.5rem;">
-                                <small
-                                    style="text-transform: uppercase; color: #999; font-size: 0.7rem; letter-spacing: 1px;">Opiekun
-                                    Marki</small>
-                                <p id="dist-name" style="font-size: 1.5rem; font-weight: 700; color: #333;">-</p>
-                            </div>
-                            <div style="margin-bottom: 1rem;">
-                                <small
-                                    style="text-transform: uppercase; color: #999; font-size: 0.7rem; letter-spacing: 1px;">Telefon</small>
-                                <p id="dist-phone" style="font-size: 1.1rem;">-</p>
-                            </div>
-                            <div>
-                                <small
-                                    style="text-transform: uppercase; color: #999; font-size: 0.7rem; letter-spacing: 1px;">Email</small>
-                                <p id="dist-email" style="font-size: 1.1rem; color: var(--color-purple);">-</p>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 id="dist-region" style="margin-bottom: 1.5rem; color: var(--color-gold);">Wybierz region
+                    </h3>
+                    <!-- Distributor cards will be dynamically inserted here -->
                 </div>
             </div>
         </section>
@@ -324,34 +373,70 @@
 
     <footer>
         <p>&copy; 2024 Shot Cosmetics Polska. Wszelkie prawa zastrzeżone.</p>
+        <div class="social-links">
+            <a href="https://www.facebook.com/share/187oNV5CgZ/?mibextid=wwXIfr" target="_blank" aria-label="Facebook">
+                <svg class="social-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
+                </svg>
+            </a>
+            <a href="https://www.instagram.com/shot.hair.polska?igsh=MXdvZHc2cmh6dzlvNw%3D%3D&utm_source=qr"
+                target="_blank" aria-label="Instagram">
+                <svg class="social-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.011-4.849-.069-3.225-.149-4.771-1.664-4.919-4.919-.058-1.265-.071-1.644-.071-4.849 0-3.204.013-3.583.071-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                </svg>
+            </a>
+        </div>
     </footer>
 
     <script src="js/main.js"></script>
     <script>
         const distributors = {
-            'POL3141': { name: 'Jan Nowak', phone: '500 100 100', email: 'wroclaw@shot.pl', label: 'Dolnośląskie' },
-            'POL3145': { name: 'Anna Kowalska', phone: '500 200 200', email: 'torun@shot.pl', label: 'Kujawsko-pomorskie' },
-            'POL3151': { name: 'Piotr Wiśniewski', phone: '500 300 300', email: 'lublin@shot.pl', label: 'Lubelskie' },
-            'POL3143': { name: 'Maria Wójcik', phone: '500 400 400', email: 'zielonagora@shot.pl', label: 'Lubuskie' },
-            'POL3147': { name: 'Krzysztof Kaczmarek', phone: '500 500 500', email: 'lodz@shot.pl', label: 'Łódzkie' },
-            'POL3170': { name: 'Agnieszka Mazur', phone: '500 600 600', email: 'krakow@shot.pl', label: 'Małopolskie' },
-            'POL3148': { name: 'Tomasz Krawczyk', phone: '500 700 700', email: 'warszawa@shot.pl', label: 'Mazowieckie' },
-            'POL3167': { name: 'Barbara Piotrowska', phone: '500 800 800', email: 'opole@shot.pl', label: 'Opolskie' },
-            'POL3152': { name: 'Michał Grabowski', phone: '500 900 900', email: 'rzeszow@shot.pl', label: 'Podkarpackie' },
-            'POL3150': { name: 'Ewa Zając', phone: '600 100 100', email: 'bialystok@shot.pl', label: 'Podlaskie' },
-            'POL3140': { name: 'Adam Pawlak', phone: '600 200 200', email: 'gdansk@shot.pl', label: 'Pomorskie' },
-            'POL3146': { name: 'Magdalena Król', phone: '600 300 300', email: 'katowice@shot.pl', label: 'Śląskie' },
-            'POL3149': { name: 'Marcin Wieczorek', phone: '600 400 400', email: 'kielce@shot.pl', label: 'Świętokrzyskie' },
-            'POL3139': { name: 'Monika Jabłońska', phone: '600 500 500', email: 'olsztyn@shot.pl', label: 'Warmińsko-mazurskie' },
-            'POL3144': { name: 'Łukasz Wróbel', phone: '600 600 600', email: 'poznan@shot.pl', label: 'Wielkopolskie' },
-            'POL3142': { name: 'Katarzyna Nowicka', phone: '600 700 700', email: 'szczecin@shot.pl', label: 'Zachodniopomorskie' }
+            'POL3141': {
+                label: 'Dolnośląskie',
+                reps: [
+                    { name: 'ATLANTIS', phone: '+48 535 015 262', cities: 'Wrocław, Oleśnica, Milicz' },
+                    { name: 'FRYZAW', phone: '+48 535 981 981', cities: 'Dzierżoniów, Kłodzko, Świdnica' }
+                ]
+            },
+            'POL3145': { label: 'Kujawsko-Pomorskie', reps: [{ name: 'HAIR PASSION', phone: '+48 575 611 038', cities: '' }] },
+            'POL3151': { label: 'Lubelskie', reps: [{ name: 'NIL SHOP', phone: '+48 512 092 162', cities: '' }] },
+            'POL3143': { label: 'Lubuskie', reps: [{ name: 'INTENSO', phone: '+48 728 827 152', cities: 'Żary, Zielona Góra' }] },
+            'POL3147': { label: 'Łódzkie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3170': {
+                label: 'Małopolskie',
+                reps: [
+                    { name: 'HAIRSTYLE', phone: '+48 53 115 995', cities: 'Kraków, Chrzanów, Nowy Targ' },
+                    { name: 'KLARA BEAUTY', phone: '+48 505 781 242', cities: 'Nowy Sącz, Gorlice' }
+                ]
+            },
+            'POL3148': { label: 'Mazowieckie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3167': { label: 'Opolskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3152': { label: 'Podkarpackie', reps: [{ name: 'KLARA BEAUTY', phone: '+48 506 066 910', cities: 'Rzeszów, Przemyśl, Stalowa Wola' }] },
+            'POL3150': { label: 'Podlaskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3140': { label: 'Pomorskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3146': {
+                label: 'Śląskie',
+                reps: [
+                    { name: 'HAIR PASSION', phone: '+48 510 285 377', cities: 'Gliwice, Zabrze, Chorzów, Katowice, Sosnowiec' },
+                    { name: '4HAIR DISTRIBUTOR', phone: '+48 798 069 888', cities: 'Częstochowa, Lubliniec, Myszków' },
+                    { name: 'R&S CAPELLI', phone: '+48 796 134 435', cities: 'Bielsko-Biała, Żywiec, Żory, Pszczyna, Cieszyn' },
+                    { name: 'HAIRSTYLE', phone: '+48 503 588 044', cities: 'Tychy, Mikołów' }
+                ]
+            },
+            'POL3149': { label: 'Świętokrzyskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3139': { label: 'Warmińsko-Mazurskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
+            'POL3144': {
+                label: 'Wielkopolskie',
+                reps: [
+                    { name: 'JANEX', phone: '+48 661 119 673', cities: 'Poznań' },
+                    { name: 'SISI', phone: '+48 660 842 842', cities: 'Oborniki, Piła, Trzcianka' }
+                ]
+            },
+            'POL3142': { label: 'Zachodniopomorskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] }
         };
 
-        const infoName = document.getElementById('dist-name');
-        const infoPhone = document.getElementById('dist-phone');
-        const infoEmail = document.getElementById('dist-email');
-        const infoRegion = document.getElementById('dist-region');
-        const infoPhoto = document.getElementById('dist-photo');
 
         // Initialize map immediately since it's inline
         console.log('Map script running');
@@ -384,27 +469,67 @@
                 p.style.fill = ''; // Reset inline style if any (none expected from this script, but safe)
             });
 
-            // Set active to current
+            // Set the clicked one as active
             const activePath = document.getElementById(id);
             if (activePath) {
                 activePath.classList.add('active');
+                console.log('Set active class on:', id);
             } else {
-                console.warn('Active path not found for ID:', id);
+                console.warn('No path found for ID:', id);
             }
 
-            // Update Info
             const data = distributors[id];
             if (data) {
-                infoRegion.textContent = data.label;
-                infoName.textContent = data.name;
-                infoPhone.textContent = data.phone;
-                infoEmail.textContent = data.email;
+                // Clear and rebuild the info panel
+                const infoPanel = document.querySelector('.info-panel');
+                const titleEl = infoPanel.querySelector('h3');
+                titleEl.textContent = data.label;
+
+                // Remove all distributor cards
+                const existingCards = infoPanel.querySelectorAll('.distributor-card');
+                existingCards.forEach(card => card.remove());
+
+                // Add each representative as a card
+                data.reps.forEach((rep, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'distributor-card';
+                    card.style.cssText = 'background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 1rem; max-width: 500px; width: 100%;';
+
+                    let html = `
+                        <div class="dist-label" style="text-transform: uppercase; color: var(--color-gold); font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 0.5rem;">OPIEKUN MARKI</div>
+                        <div class="dist-name" style="font-weight: 700; font-size: 1.2rem; color: var(--color-purple-dark); margin-bottom: 0.8rem;">${rep.name}</div>
+                    `;
+
+                    if (rep.cities) {
+                        html += `<div class="dist-cities" style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.8rem;">${rep.cities}</div>`;
+                    }
+
+                    html += `
+                        <div class="dist-phone">
+                            <div style="font-weight: 700; color: var(--color-purple-dark); font-size: 0.8rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Telefon</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--color-text);"><a href="tel:${rep.phone.replace(/\s/g, '')}" style="color: inherit; text-decoration: none;">${rep.phone}</a></div>
+                        </div>
+                    `;
+
+                    // Add email only for regions without specific cities (means they use central contact)
+                    if (!rep.cities && rep.name === 'HAIR PASSION') {
+                        html += `
+                            <div class="dist-email" style="margin-top: 0.8rem;">
+                                <div style="font-weight: 700; color: var(--color-purple-dark); font-size: 0.8rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">E-mail</div>
+                                <div style="font-size: 0.95rem;"><a href="mailto:bok@shothair.pl" style="color: var(--color-purple); text-decoration: none;">bok@shothair.pl</a></div>
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = html;
+                    infoPanel.appendChild(card);
+                });
             } else {
                 console.warn('No data found for ID:', id);
             }
         }
     </script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=3"></script>
 </body>
 
 </html>

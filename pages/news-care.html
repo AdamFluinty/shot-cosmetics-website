@@ -13,14 +13,35 @@
         <div class="container">
             <nav>
                 <a href="../index.html" class="logo">Shot<span style="color:var(--color-gold)">.</span></a>
-                <div class="menu-toggle" id="mobile-menu" style="z-index: 9999; cursor: pointer;"
-                    onclick="document.querySelector('.nav-links').classList.toggle('active')">☰</div>
+                <div class="menu-toggle" id="mobile-menu" style="z-index: 10005; cursor: pointer;"
+                    onclick="document.querySelector('.nav-links').classList.toggle('active')">&#9776;</div>
                 <ul class="nav-links">
                     <li><a href="../index.html">Home</a></li>
                     <li><a href="about.html">O Nas</a></li>
-                    <li><a href="products.html">Produkty</a></li>
+                    <li class="dropdown">
+                        <a href="javascript:void(0)" class="dropdown-toggle">Produkty</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="products.html?cat=koloryzacja">Koloryzacja</a></li>
+                            <li><a href="products.html?cat=rozjasnianie">Rozjaśnianie</a></li>
+                            <li class="has-submenu">
+                                <a href="products.html?cat=pielegnacja">Pielęgnacja</a>
+                                <ul class="submenu">
+                                    <li><a href="products.html?cat=pielegnacja&sub=0">Color Care</a></li>
+                                    <li><a href="products.html?cat=pielegnacja&sub=1">Simply Blond</a></li>
+                                    <li><a href="products.html?cat=pielegnacja&sub=2">Anti-Age</a></li>
+                                    <li><a href="products.html?cat=pielegnacja&sub=3">Anti-Stress</a></li>
+                                    <li><a href="products.html?cat=pielegnacja&sub=4">Texturizing</a></li>
+                                    <li><a href="products.html?cat=pielegnacja&sub=5">Tricoilogy</a></li>
+                                    <li><a href="products.html?cat=pielegnacja&sub=6">Sun</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="products.html?cat=zabiegi-kuracje">Zabiegi</a></li>
+                            <li><a href="products.html?cat=techniczne">Techniczne</a></li>
+                            <li><a href="products.html?cat=stylizacja">Stylizacja</a></li>
+                        </ul>
+                    </li>
                     <li><a href="education.html">Edukacja</a></li>
-                    <li><a href="news.html" class="active">Świat Shot</a></li>
+                    <li><a href="news.html">Świat Shot</a></li>
                     <li><a href="contact.html">Kontakt</a></li>
                 </ul>
             </nav>
@@ -64,3 +85,4 @@
 </body>
 
 </html>
+
