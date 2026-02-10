@@ -115,7 +115,7 @@
                 </div>
                 <div style="order: 1; position: relative;">
                     <div id="about-image"
-                        style="height: 600px; background: url('assets/images/about_salon.png') center top/cover; position: relative; z-index: 1; box-shadow: var(--shadow-subtle);">
+                        style="height: 600px; background-color: #f0f0f0; background-image: url('assets/images/about_salon.png'); background-position: center top; background-size: cover; position: relative; z-index: 1; box-shadow: var(--shadow-subtle);">
                     </div>
                     <div
                         style="position: absolute; top: -20px; left: -20px; width: 100%; height: 100%; border: 1px solid var(--color-gold); z-index: 0;">
@@ -440,7 +440,13 @@
             // Background image
             if (hero.background_image) {
                 const imgUrl = StrapiAPI.getImageUrl(hero.background_image);
-                if (imgUrl) document.getElementById('hero-section').style.background = `url('${imgUrl}') center top/cover no-repeat`;
+                if (imgUrl) {
+                    const el = document.getElementById('hero-section');
+                    el.style.backgroundImage = `url('${imgUrl}')`;
+                    el.style.backgroundPosition = 'center top';
+                    el.style.backgroundSize = 'cover';
+                    el.style.backgroundRepeat = 'no-repeat';
+                }
             }
             // Subtitle as badge (e.g. "PROFESJONALNA KOLORYZACJA...")
             if (hero.subtitle) document.getElementById('hero-badge').textContent = hero.subtitle;
@@ -480,7 +486,12 @@
             // image
             if (about.image) {
                 const imgUrl = StrapiAPI.getImageUrl(about.image);
-                if (imgUrl) document.getElementById('about-image').style.background = `url('${imgUrl}') center top/cover`;
+                if (imgUrl) {
+                    const el = document.getElementById('about-image');
+                    el.style.backgroundImage = `url('${imgUrl}')`;
+                    el.style.backgroundPosition = 'center top';
+                    el.style.backgroundSize = 'cover';
+                }
             }
         }
 
