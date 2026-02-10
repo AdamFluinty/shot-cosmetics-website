@@ -208,33 +208,7 @@
 
     <script src="../js/api.js?v=4"></script>
     <script src="../js/main.js?v=3"></script>
-    <script>
-        (async function () {
-            const about = await StrapiAPI.fetchAboutPage();
-            if (!about) return;
-
-            if (about.hero_title) document.getElementById('about-hero-title').innerHTML = about.hero_title.replace('\n', '<br>');
-            if (about.hero_subtitle) document.getElementById('about-hero-subtitle').textContent = about.hero_subtitle;
-            if (about.history_heading) document.getElementById('about-history-heading').textContent = about.history_heading;
-            if (about.history_paragraph_1) document.getElementById('about-history-p1').textContent = about.history_paragraph_1;
-            if (about.history_paragraph_2) document.getElementById('about-history-p2').textContent = about.history_paragraph_2;
-
-            // Dynamic values if provided by API
-            if (about.values && about.values.length > 0) {
-                const icons = ['⚡', '🏅', '💡', '🤝'];
-                const grid = document.getElementById('values-grid');
-                grid.innerHTML = about.values.map((v, i) => `
-                    <div style="padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 8px; transition: transform 0.3s; height: 100%;">
-                        <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-                            ${icons[i] || '✨'}
-                        </div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--color-white);">${v.title}</h3>
-                        <p style="opacity: 0.8; line-height: 1.6;">${v.description}</p>
-                    </div>
-                `).join('');
-            }
-        })();
-    </script>
+    <!-- About page content is static until about-page content type is created in Strapi -->
 </body>
 
 </html>

@@ -492,23 +492,47 @@
         async function loadHero() {
             const hero = await StrapiAPI.fetchHomepageHero();
             if (!hero) return;
+            // Background image
             if (hero.background_image) {
                 const imgUrl = StrapiAPI.getImageUrl(hero.background_image);
                 if (imgUrl) document.getElementById('hero-section').style.background = `url('${imgUrl}') center top/cover no-repeat`;
             }
-            if (hero.badge) document.getElementById('hero-badge').textContent = hero.badge;
-            if (hero.title) document.getElementById('hero-title').innerHTML = hero.title.replace('\n', '<br>');
-            if (hero.subtitle) document.getElementById('hero-subtitle').textContent = hero.subtitle;
+            // Subtitle as badge (e.g. "PROFESJONALNA KOLORYZACJA...")
+            if (hero.subtitle) document.getElementById('hero-badge').textContent = hero.subtitle;
+            // Build title from title_line1 + title_highlight + title_line2
+            const parts = [];
+            if (hero.title_line1) parts.push(hero.title_line1);
+            if (hero.title_highlight) parts.push(`<span style="color: var(--color-gold)">${hero.title_highlight}</span>`);
+            if (hero.title_line2) parts.push(`<br>${hero.title_line2}`);
+            if (parts.length > 0) document.getElementById('hero-title').innerHTML = parts.join(' ');
+            // Description
+            if (hero.description) document.getElementById('hero-subtitle').textContent = hero.description;
+            // CTA buttons
+            if (hero.cta_text || hero.cta_link) {
+                const btns = document.getElementById('hero-buttons');
+                btns.innerHTML = `
+                    <a href="${hero.cta_link || 'pages/products.html'}" class="btn btn-primary"
+                        style="background: var(--color-gold); border-color: var(--color-gold); color: black;">${hero.cta_text || 'Odkryj Produkty'}</a>
+                    <a href="pages/contact.html" class="btn btn-outline"
+                        style="border-color: white; color: white;">Strefa Fryzjera</a>
+                `;
+            }
         }
 
         // ── About from CMS ──
         async function loadAbout() {
             const about = await StrapiAPI.fetchHomepageAbout();
             if (!about) return;
-            if (about.badge) document.getElementById('about-badge').textContent = about.badge;
-            if (about.heading) document.getElementById('about-heading').textContent = about.heading;
-            if (about.paragraph_1) document.getElementById('about-text1').textContent = about.paragraph_1;
-            if (about.paragraph_2) document.getElementById('about-text2').textContent = about.paragraph_2;
+            // section_label → badge (e.g. "O NAS")
+            if (about.section_label) document.getElementById('about-badge').textContent = about.section_label;
+            // title → heading (e.g. "Profesjonalizm rodem z Włoch")
+            if (about.title) document.getElementById('about-heading').textContent = about.title;
+            // description → first paragraph
+            if (about.description) {
+                document.getElementById('about-text1').textContent = about.description;
+                document.getElementById('about-text2').style.display = 'none';
+            }
+            // image
             if (about.image) {
                 const imgUrl = StrapiAPI.getImageUrl(about.image);
                 if (imgUrl) document.getElementById('about-image').style.background = `url('${imgUrl}') center/cover`;

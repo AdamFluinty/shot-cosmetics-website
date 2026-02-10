@@ -303,12 +303,14 @@
             }
             grid.innerHTML = educators.map(e => {
                 const imgUrl = StrapiAPI.getImageUrl(e.photo);
+                const specs = (e.specializations || []).map(s => s.label).join(', ');
                 return `
                     <div class="educator-card">
                         <img src="${imgUrl || '../assets/images/educator1.png'}" alt="${e.name}" class="educator-img">
-                        <span class="educator-role">${e.role || 'Edukator'}</span>
+                        <span class="educator-role">${e.title || 'Edukator Shot'}</span>
                         <h3>${e.name}</h3>
                         <p style="color: var(--color-text-light); font-size: 0.95rem;">${e.bio || ''}</p>
+                        ${specs ? `<p style="color: var(--color-purple); font-size: 0.8rem; margin-top: 0.5rem; font-weight: 600;">${specs}</p>` : ''}
                     </div>
                 `;
             }).join('');
@@ -336,7 +338,7 @@
                             <p style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.5rem; max-width: 600px;">${ev.description || ''}</p>
                             <div class="event-meta">
                                 <span>• ${ev.location || 'Online'}</span>
-                                <span>• ${ev.status || 'Miejsca dostępne'}</span>
+                                <span>• ${ev.is_full ? 'Lista zamknięta' : 'Miejsca dostępne'}</span>
                             </div>
                         </div>
                     </div>
