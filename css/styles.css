@@ -52,6 +52,10 @@
     box-sizing: border-box;
 }
 
+html, body {
+    min-height: 100vh;
+}
+
 body {
     font-family: var(--font-body);
     background-color: var(--color-cream);
@@ -62,6 +66,8 @@ body {
     max-width: 100%;
     font-weight: 300;
     font-size: 16px;
+    display: flex;
+    flex-direction: column;
 }
 
 body.menu-open {
@@ -792,8 +798,19 @@ footer {
 
     /* Reduce height of the image container on mobile (override inline 600px) */
     #about .grid-2-cols>div>div[style*="height"] {
-        height: 100px !important;
+        height: 250px !important;
         background-position: center top !important;
+    }
+
+    /* Reduce container side padding on mobile */
+    .container {
+        padding: 0 1.5rem !important;
+    }
+
+    /* Education program section needs side padding */
+    .program-section {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
     }
 
     /* 7. Products Grid */
