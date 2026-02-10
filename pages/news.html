@@ -112,7 +112,7 @@
                 return `
                     <a href="news-detail.html?slug=${a.slug}" style="text-decoration: none; color: inherit;">
                     <div class="card" style="overflow: hidden; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="height: 250px; background: #eee ${imgUrl ? `url('${imgUrl}') center/cover` : ''}; display: flex; align-items: center; justify-content: center;">
+                        <div style="height: 250px; background: #eee ${imgUrl ? `url('${imgUrl}') center top/cover` : ''}; display: flex; align-items: center; justify-content: center;">
                             ${!imgUrl ? '<span style="color: #bbb; font-size: 2rem;">📰</span>' : ''}
                         </div>
                         <div style="padding: 2rem;">

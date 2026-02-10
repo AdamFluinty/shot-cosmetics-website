@@ -110,7 +110,7 @@
                     style="color: var(--color-gold); display: block; margin-bottom: 1rem;">${article.category_label || 'Aktualności'}</span>
                 <h1 style="margin-bottom: 1rem; font-size: 2.5rem; line-height: 1.2;">${article.title}</h1>
                 ${date ? `<p style="color: var(--color-text-light); margin-bottom: 2rem; font-size: 0.9rem;">${date}</p>` : ''}
-                ${imgUrl ? `<div style="width: 100%; height: 400px; background: #eee url('${imgUrl}') center/cover; margin-bottom: 3rem; border-radius: 8px;"></div>` : ''}
+                ${imgUrl ? `<div style="width: 100%; height: 400px; background: #eee url('${imgUrl}') center top/cover; margin-bottom: 3rem; border-radius: 8px;"></div>` : ''}
                 <div style="font-size: 1.1rem; line-height: 1.8; color: var(--color-text);">
                     ${contentHTML}
                 </div>
