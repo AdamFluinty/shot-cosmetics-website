@@ -723,14 +723,10 @@ footer {
 /* 4. Hero Section & Rest of Content (Mobile Layout) */
 @media (max-width: 768px) {
     .hero {
-        padding-top: 14rem !important;
-        /* increased from 8rem to clear header completely and show text */
-        min-height: auto !important;
-        /* Allow content to dictate height */
+        padding-top: 6rem !important;
+        padding-bottom: 3rem !important;
         background-position: center top !important;
-        /* Ensure image top is visible */
         background-size: cover !important;
-        /* Ensure full coverage on mobile */
     }
 
     .hero-content {

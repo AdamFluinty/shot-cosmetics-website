@@ -73,15 +73,12 @@
         <section id="hero-section" class="hero"
             style="background-color: var(--color-purple-dark); margin-bottom: 0; min-height: 100vh; padding-top: 8rem; background-size: cover; background-position: center top; background-repeat: no-repeat;">
             <div class="hero-overlay"></div>
-            <div class="container hero-content">
+            <div class="container hero-content" style="opacity: 0; transition: opacity 0.5s ease;">
                 <span id="hero-badge" class="text-uppercase"
-                    style="display:block; margin-bottom: 1rem; letter-spacing: 0.3em; opacity: 0.9;">Made in
-                    Italy</span>
-                <h1 id="hero-title" style="color: white; margin-bottom: 1.5rem;">Włoska Perfekcja<br>w Twoim Salonie
-                </h1>
+                    style="display:block; margin-bottom: 1rem; letter-spacing: 0.3em; opacity: 0.9;"></span>
+                <h1 id="hero-title" style="color: white; margin-bottom: 1.5rem;">&nbsp;</h1>
                 <p id="hero-subtitle"
                     style="font-size: 1.2rem; margin-bottom: 3rem; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto;">
-                    Odkryj luksusową pielęgnację i koloryzacją, która łączy naturę z zaawansowaną technologią.
                 </p>
                 <div id="hero-buttons" style="display: flex; gap: 1.5rem; justify-content: center;">
                     <a href="pages/products.html" class="btn btn-primary"
@@ -468,6 +465,8 @@
                         style="border-color: white; color: white;">Strefa Fryzjera</a>
                 `;
             }
+            // Reveal hero content with fade
+            document.querySelector('#hero-section .hero-content').style.opacity = '1';
         }
 
         // ── About from CMS ──
@@ -553,6 +552,11 @@
         loadNews();
         loadContact();
         loadDistributors();
+
+        // Safety timeout: reveal hero even if CMS is slow
+        setTimeout(() => {
+            document.querySelectorAll('.hero-content').forEach(el => el.style.opacity = '1');
+        }, 3000);
     </script>
     <script src="js/main.js?v=3"></script>
 </body>

@@ -185,10 +185,10 @@
         <!-- Hero Title -->
         <section id="edu-hero"
             style="background: var(--color-purple-dark); padding: 6rem 0 4rem; text-align: center; margin-top: 4rem; margin-bottom: 2rem;">
-            <div class="container">
+            <div class="container" style="opacity: 0; transition: opacity 0.5s ease;">
                 <span id="edu-hero-label" class="text-uppercase"
-                    style="color: var(--color-gold); margin-bottom: 1rem; display: block;">Rozwój i Wiedza</span>
-                <h1 id="edu-hero-title" style="color: white; margin-bottom: 0;">Akademia Shot</h1>
+                    style="color: var(--color-gold); margin-bottom: 1rem; display: block;"></span>
+                <h1 id="edu-hero-title" style="color: white; margin-bottom: 0;">&nbsp;</h1>
             </div>
         </section>
 
@@ -376,7 +376,14 @@
                     `<li>• <strong>${f.title}:</strong> ${f.description}</li>`
                 ).join('');
             }
+            // Reveal hero content with fade
+            document.querySelector('#edu-hero .container').style.opacity = '1';
         })();
+
+        // Safety timeout: reveal hero even if CMS is slow
+        setTimeout(() => {
+            document.querySelectorAll('.hero-content, #edu-hero .container').forEach(el => el.style.opacity = '1');
+        }, 3000);
     </script>
 </body>
 

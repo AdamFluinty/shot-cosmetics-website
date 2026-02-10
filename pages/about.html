@@ -54,13 +54,11 @@
         <section id="about-hero" class="hero"
             style="min-height: 60vh; background: url('../assets/images/about_salon.png') center top/cover no-repeat fixed; margin-top: 4rem; margin-bottom: 2rem;">
             <div class="hero-overlay" style="background: rgba(42, 10, 74, 0.7);"></div>
-            <div class="container hero-content">
-                <span class="text-uppercase" style="display:block; margin-bottom: 1rem; color: var(--color-gold);">O
-                    Nas</span>
-                <h1 id="about-hero-title" style="color: white; margin-bottom: 1.5rem;">Włoskie Korzenie,<br>Światowa
-                    Jakość</h1>
+            <div class="container hero-content" style="opacity: 0; transition: opacity 0.5s ease;">
+                <span class="text-uppercase"
+                    style="display:block; margin-bottom: 1rem; color: var(--color-gold);"></span>
+                <h1 id="about-hero-title" style="color: white; margin-bottom: 1.5rem;">&nbsp;</h1>
                 <p id="about-hero-subtitle" style="opacity: 0.9; max-width: 600px; margin: 0 auto; font-size: 1.2rem;">
-                    Poznaj historię marki, która od ponad 20 lat redefiniuje pojęcie profesjonalnej pielęgnacji włosów.
                 </p>
             </div>
         </section>
@@ -257,7 +255,14 @@
                     </div>
                 `).join('');
             }
+            // Reveal hero content with fade
+            document.querySelector('#about-hero .hero-content').style.opacity = '1';
         })();
+
+        // Safety timeout: reveal hero even if CMS is slow
+        setTimeout(() => {
+            document.querySelectorAll('.hero-content').forEach(el => el.style.opacity = '1');
+        }, 3000);
     </script>
 </body>
 
