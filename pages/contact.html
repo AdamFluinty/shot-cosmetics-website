@@ -294,62 +294,55 @@
         </div>
     </footer>
 
+    <script src="../js/api.js?v=4"></script>
     <script src="../js/main.js?v=3"></script>
     <script>
-
-        const distributors = {
-            'POL3141': {
-                label: 'Dolnośląskie',
-                reps: [
-                    { name: 'ATLANTIS', phone: '+48 535 015 262', cities: 'Wrocław, Oleśnica, Milicz' },
-                    { name: 'FRYZAW', phone: '+48 535 981 981', cities: 'Dzierżoniów, Kłodzko, Świdnica' }
-                ]
-            },
-            'POL3145': { label: 'Kujawsko-Pomorskie', reps: [{ name: 'HAIR PASSION', phone: '+48 575 611 038', cities: '' }] },
-            'POL3151': { label: 'Lubelskie', reps: [{ name: 'NIL SHOP', phone: '+48 512 092 162', cities: '' }] },
-            'POL3143': { label: 'Lubuskie', reps: [{ name: 'INTENSO', phone: '+48 728 827 152', cities: 'Żary, Zielona Góra' }] },
-            'POL3147': { label: 'Łódzkie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3170': {
-                label: 'Małopolskie',
-                reps: [
-                    { name: 'HAIRSTYLE', phone: '+48 53 115 995', cities: 'Kraków, Chrzanów, Nowy Targ' },
-                    { name: 'KLARA BEAUTY', phone: '+48 505 781 242', cities: 'Nowy Sącz, Gorlice' }
-                ]
-            },
-            'POL3148': { label: 'Mazowieckie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3167': { label: 'Opolskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3152': { label: 'Podkarpackie', reps: [{ name: 'KLARA BEAUTY', phone: '+48 506 066 910', cities: 'Rzeszów, Przemyśl, Stalowa Wola' }] },
-            'POL3150': { label: 'Podlaskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3140': { label: 'Pomorskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3146': {
-                label: 'Śląskie',
-                reps: [
-                    { name: 'HAIR PASSION', phone: '+48 510 285 377', cities: 'Gliwice, Zabrze, Chorzów, Katowice, Sosnowiec' },
-                    { name: '4HAIR DISTRIBUTOR', phone: '+48 798 069 888', cities: 'Częstochowa, Lubliniec, Myszków' },
-                    { name: 'R&S CAPELLI', phone: '+48 796 134 435', cities: 'Bielsko-Biała, Żywiec, Żory, Pszczyna, Cieszyn' },
-                    { name: 'HAIRSTYLE', phone: '+48 503 588 044', cities: 'Tychy, Mikołów' }
-                ]
-            },
-            'POL3149': { label: 'Świętokrzyskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3139': { label: 'Warmińsko-Mazurskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] },
-            'POL3144': {
-                label: 'Wielkopolskie',
-                reps: [
-                    { name: 'JANEX', phone: '+48 661 119 673', cities: 'Poznań' },
-                    { name: 'SISI', phone: '+48 660 842 842', cities: 'Oborniki, Piła, Trzcianka' }
-                ]
-            },
-            'POL3142': { label: 'Zachodniopomorskie', reps: [{ name: 'HAIR PASSION', phone: '+48 510 285 377', cities: '' }] }
+        const voivodeshipMap = {
+            'dolnoslaskie': 'POL3141',
+            'kujawsko-pomorskie': 'POL3145',
+            'lubelskie': 'POL3151',
+            'lubuskie': 'POL3143',
+            'lodzkie': 'POL3147',
+            'malopolskie': 'POL3170',
+            'mazowieckie': 'POL3148',
+            'opolskie': 'POL3167',
+            'podkarpackie': 'POL3152',
+            'podlaskie': 'POL3150',
+            'pomorskie': 'POL3140',
+            'slaskie': 'POL3146',
+            'swietokrzyskie': 'POL3149',
+            'warminsko-mazurskie': 'POL3139',
+            'wielkopolskie': 'POL3144',
+            'zachodniopomorskie': 'POL3142'
         };
 
+        let distributors = {};
         const infoRegion = document.getElementById('dist-region');
+
+        async function loadDistributors() {
+            const data = await StrapiAPI.fetchDistributors();
+            if (!data) return;
+
+            data.forEach(d => {
+                const svgId = voivodeshipMap[d.voivodeship_id];
+                if (svgId) {
+                    distributors[svgId] = {
+                        label: d.voivodeship_name,
+                        reps: (d.representatives || []).map(r => ({
+                            name: r.name,
+                            phone: r.phone,
+                            cities: r.cities || ''
+                        }))
+                    };
+                }
+            });
+
+            initMap();
+        }
 
         function initMap() {
             const paths = document.querySelectorAll('.voivodship');
-
-            // Initial Set (Warszawa)
             setActiveRegion('POL3148');
-
             paths.forEach(path => {
                 path.addEventListener('click', function () {
                     setActiveRegion(this.id);
@@ -365,56 +358,48 @@
             if (activePath) activePath.classList.add('active');
 
             const data = distributors[id];
-            if (data) {
-                infoRegion.textContent = data.label;
+            const infoPanel = document.querySelector('.info-panel');
+            const existingCards = infoPanel.querySelectorAll('.distributor-card');
+            existingCards.forEach(card => card.remove());
 
-                // Clear and rebuild the info panel
-                const infoPanel = document.querySelector('.info-panel');
-                const titleEl = infoPanel.querySelector('h3');
+            if (!data) {
+                infoRegion.textContent = 'Brak danych dla tego regionu';
+                return;
+            }
 
-                // Remove all distributor cards
-                const existingCards = infoPanel.querySelectorAll('.distributor-card');
-                existingCards.forEach(card => card.remove());
+            infoRegion.textContent = data.label;
+            data.reps.forEach(rep => {
+                const card = document.createElement('div');
+                card.className = 'distributor-card';
+                card.style.cssText = 'background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 1rem; max-width: 500px; width: 100%;';
 
-                // Add each representative as a card
-                data.reps.forEach((rep, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'distributor-card';
-                    card.style.cssText = 'background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 1rem; max-width: 500px; width: 100%;';
-
-                    let html = `
-                        <div class="dist-label" style="text-transform: uppercase; color: var(--color-gold); font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 0.5rem;">OPIEKUN MARKI</div>
-                        <div class="dist-name" style="font-weight: 700; font-size: 1.2rem; color: var(--color-purple-dark); margin-bottom: 0.8rem;">${rep.name}</div>
-                    `;
-
-                    if (rep.cities) {
-                        html += `<div class="dist-cities" style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.8rem;">${rep.cities}</div>`;
-                    }
-
+                let html = `
+                    <div class="dist-label" style="text-transform: uppercase; color: var(--color-gold); font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 0.5rem;">OPIEKUN MARKI</div>
+                    <div class="dist-name" style="font-weight: 700; font-size: 1.2rem; color: var(--color-purple-dark); margin-bottom: 0.8rem;">${rep.name}</div>
+                `;
+                if (rep.cities) {
+                    html += `<div class="dist-cities" style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.8rem;">${rep.cities}</div>`;
+                }
+                html += `
+                    <div class="dist-phone">
+                        <div style="font-weight: 700; color: var(--color-purple-dark); font-size: 0.8rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Telefon</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; color: var(--color-text);"><a href="tel:${rep.phone.replace(/\s/g, '')}" style="color: inherit; text-decoration: none;">${rep.phone}</a></div>
+                    </div>
+                `;
+                if (!rep.cities && rep.name === 'HAIR PASSION') {
                     html += `
-                        <div class="dist-phone">
-                            <div style="font-weight: 700; color: var(--color-purple-dark); font-size: 0.8rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Telefon</div>
-                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--color-text);"><a href="tel:${rep.phone.replace(/\s/g, '')}" style="color: inherit; text-decoration: none;">${rep.phone}</a></div>
+                        <div class="dist-email" style="margin-top: 0.8rem;">
+                            <div style="font-weight: 700; color: var(--color-purple-dark); font-size: 0.8rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">E-mail</div>
+                            <div style="font-size: 0.95rem;"><a href="mailto:bok@shothair.pl" style="color: var(--color-purple); text-decoration: none;">bok@shothair.pl</a></div>
                         </div>
                     `;
-
-                    // Add email only for regions without specific cities (means they use central contact)
-                    if (!rep.cities && rep.name === 'HAIR PASSION') {
-                        html += `
-                            <div class="dist-email" style="margin-top: 0.8rem;">
-                                <div style="font-weight: 700; color: var(--color-purple-dark); font-size: 0.8rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">E-mail</div>
-                                <div style="font-size: 0.95rem;"><a href="mailto:bok@shothair.pl" style="color: var(--color-purple); text-decoration: none;">bok@shothair.pl</a></div>
-                            </div>
-                        `;
-                    }
-
-                    card.innerHTML = html;
-                    infoPanel.appendChild(card);
-                });
-            }
+                }
+                card.innerHTML = html;
+                infoPanel.appendChild(card);
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', initMap);
+        loadDistributors();
     </script>
 </body>
 

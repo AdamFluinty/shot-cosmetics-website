@@ -246,28 +246,10 @@
                 <h2>Zespół Edukatorów</h2>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
-                <!-- Educator 1 -->
-                <div class="educator-card">
-                    <img src="../assets/images/educator1.png" alt="Anna Kowalska" class="educator-img">
-                    <span class="educator-role">International Colorist</span>
-                    <h3>Anna Kowalska</h3>
-                    <p style="color: var(--color-text-light); font-size: 0.95rem;">
-                        Specjalistka od kreatywnych koloryzacji i dekoloryzacji. Autorka techniki "Shot Balayage". W
-                        branży od 15 lat, szkoliła się w Mediolanie i Londynie.
-                    </p>
-                </div>
-
-                <!-- Educator 2 -->
-                <div class="educator-card">
-                    <img src="../assets/images/educator2.png" alt="Piotr Nowak" class="educator-img">
-                    <span class="educator-role">Lead Stylist & Cutter</span>
-                    <h3>Piotr Nowak</h3>
-                    <p style="color: var(--color-text-light); font-size: 0.95rem;">
-                        Mistrz precyzyjnego cięcia i stylizacji. Jego pasją jest geometria fryzur i dopasowanie formy do
-                        kształtu twarzy. Wieloletni edukator marki Shot.
-                    </p>
-                </div>
+            <div id="educators-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
+                <p class="text-center" style="color: var(--color-text-muted); grid-column: 1/-1;">Ładowanie
+                    edukatorów...</p>
             </div>
         </section>
 
@@ -278,66 +260,8 @@
                 <div style="width: 60px; height: 3px; background: var(--color-gold); margin: 1rem auto;"></div>
             </div>
 
-            <div class="calendar-list">
-                <!-- Event 1 -->
-                <div class="calendar-item">
-                    <div class="date-box">
-                        <span class="date-day">15</span>
-                        <span class="date-month">LIS</span>
-                    </div>
-                    <div class="event-info">
-                        <h4>Szkolenie Podstawowe: Koloryzacja DNA</h4>
-                        <p
-                            style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.5rem; max-width: 600px;">
-                            Opanuj podstawy naszej nowej, rewolucyjnej technologii koloryzacji. Dowiedz się, jak
-                            wykorzystać kolagen i kwasy owocowe dla perfekcyjnych rezultatów.
-                        </p>
-                        <div class="event-meta">
-                            <span>• Warszawa, Centrum Szkoleniowe Shot</span>
-                            <span>• Miejsca dostępne</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 2 -->
-                <div class="calendar-item">
-                    <div class="date-box">
-                        <span class="date-day">22</span>
-                        <span class="date-month">LIS</span>
-                    </div>
-                    <div class="event-info">
-                        <h4>Blond Mastery - Warsztaty Praktyczne</h4>
-                        <p
-                            style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.5rem; max-width: 600px;">
-                            Zaawansowane techniki rozjaśniania i tonowania dla uzyskania idealnych blondów. Intensywne
-                            warsztaty na modelkach pod okiem mistrzów.
-                        </p>
-                        <div class="event-meta">
-                            <span>• Kraków, Hotel Galaxy</span>
-                            <span>• Lista rezerwowa</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 3 -->
-                <div class="calendar-item">
-                    <div class="date-box">
-                        <span class="date-day">05</span>
-                        <span class="date-month">GRU</span>
-                    </div>
-                    <div class="event-info">
-                        <h4>Pielęgnacja Zimowa i Trychologia</h4>
-                        <p
-                            style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.5rem; max-width: 600px;">
-                            Jak dbać o włosy w trudnych warunkach zimowych? Poznaj nasze procedury zabiegowe i diagnozę
-                            skóry głowy na webinarze.
-                        </p>
-                        <div class="event-meta">
-                            <span>• Online (Webinar)</span>
-                            <span>• Miejsca dostępne</span>
-                        </div>
-                    </div>
-                </div>
+            <div id="events-list" class="calendar-list">
+                <p class="text-center" style="padding: 3rem; color: var(--color-text-muted);">Ładowanie wydarzeń...</p>
             </div>
         </section>
 
@@ -365,7 +289,64 @@
         </div>
     </footer>
 
+    <script src="../js/api.js?v=4"></script>
     <script src="../js/main.js?v=3"></script>
+    <script>
+        const MONTHS_PL = ['STY', 'LUT', 'MAR', 'KWI', 'MAJ', 'CZE', 'LIP', 'SIE', 'WRZ', 'PAŹ', 'LIS', 'GRU'];
+
+        async function loadEducators() {
+            const grid = document.getElementById('educators-grid');
+            const educators = await StrapiAPI.fetchEducators();
+            if (!educators || educators.length === 0) {
+                grid.innerHTML = '<p class="text-center" style="color: var(--color-text-muted); grid-column: 1/-1;">Brak edukatorów.</p>';
+                return;
+            }
+            grid.innerHTML = educators.map(e => {
+                const imgUrl = StrapiAPI.getImageUrl(e.photo);
+                return `
+                    <div class="educator-card">
+                        <img src="${imgUrl || '../assets/images/educator1.png'}" alt="${e.name}" class="educator-img">
+                        <span class="educator-role">${e.role || 'Edukator'}</span>
+                        <h3>${e.name}</h3>
+                        <p style="color: var(--color-text-light); font-size: 0.95rem;">${e.bio || ''}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadEvents() {
+            const list = document.getElementById('events-list');
+            const events = await StrapiAPI.fetchEvents();
+            if (!events || events.length === 0) {
+                list.innerHTML = '<p class="text-center" style="padding: 3rem; color: var(--color-text-muted);">Brak zaplanowanych szkoleń.</p>';
+                return;
+            }
+            list.innerHTML = events.map(ev => {
+                const d = ev.date ? new Date(ev.date) : null;
+                const day = d ? String(d.getDate()).padStart(2, '0') : '??';
+                const month = d ? MONTHS_PL[d.getMonth()] : '???';
+                return `
+                    <div class="calendar-item">
+                        <div class="date-box">
+                            <span class="date-day">${day}</span>
+                            <span class="date-month">${month}</span>
+                        </div>
+                        <div class="event-info">
+                            <h4>${ev.title}</h4>
+                            <p style="color: var(--color-text-light); font-size: 0.9rem; margin-bottom: 0.5rem; max-width: 600px;">${ev.description || ''}</p>
+                            <div class="event-meta">
+                                <span>• ${ev.location || 'Online'}</span>
+                                <span>• ${ev.status || 'Miejsca dostępne'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        loadEducators();
+        loadEvents();
+    </script>
 </body>
 
 </html>
