@@ -130,7 +130,7 @@ async function fetchHomepageAbout() {
 }
 
 async function fetchAboutPage() {
-    return await strapiFetch('/about-page?populate[values]=*');
+    return await strapiFetch('/about-page?populate[values]=*&populate[history_image]=*');
 }
 
 async function fetchContactInfo() {
