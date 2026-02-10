@@ -316,7 +316,7 @@
 
         async function loadEvents() {
             const list = document.getElementById('events-list');
-            const events = await StrapiAPI.fetchEvents();
+            const events = await StrapiAPI.fetchEducationEvents();
             if (!events || events.length === 0) {
                 list.innerHTML = '<p class="text-center" style="padding: 3rem; color: var(--color-text-muted);">Brak zaplanowanych szkoleń.</p>';
                 return;
