@@ -10,16 +10,21 @@ const API = `${STRAPI_URL}/api`;
  * Generic fetch helper with error handling and caching
  */
 const _cache = {};
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 async function strapiFetch(endpoint) {
-    if (_cache[endpoint]) return _cache[endpoint];
+    const cached = _cache[endpoint];
+    if (cached && (Date.now() - cached.time < CACHE_TTL)) return cached.data;
     try {
         const response = await fetch(`${API}${endpoint}`);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const json = await response.json();
-        _cache[endpoint] = json.data;
+        _cache[endpoint] = { data: json.data, time: Date.now() };
         return json.data;
     } catch (error) {
         console.error(`[StrapiAPI] Error fetching ${endpoint}:`, error);
+        // Return stale cache if available
+        if (cached) return cached.data;
         return null;
     }
 }

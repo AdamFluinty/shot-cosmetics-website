@@ -24,7 +24,7 @@
 
     // Drill-down Menu Handler
     const initDrillDown = () => {
-        console.log('--- Initializing Drill Down (v5) ---');
+
         document.querySelectorAll('.dropdown-menu, .submenu').forEach(menu => {
             if (!menu.querySelector('.menu-back')) {
                 const backItem = document.createElement('li');
@@ -62,7 +62,7 @@
     // SINGLE Global Click/Touch Listener
     // Note: iOS Safari handles click events on non-interactive elements only if they have cursor:pointer
     document.addEventListener('click', function (e) {
-        console.log('Interaction on:', e.target.tagName, e.target.className);
+
 
         // 1. Hamburger Toggle
         const toggle = e.target.closest('.menu-toggle');
@@ -72,7 +72,7 @@
             if (navLinks) {
                 const isActive = navLinks.classList.toggle('active');
                 toggleBodyLock(isActive);
-                console.log('Menu Toggled! Status:', isActive);
+
             }
             return;
         }
@@ -140,5 +140,5 @@
         }
     }, { passive: false });
 
-    console.log('Main JS (v5) Nuclear Ready');
+
 })();
