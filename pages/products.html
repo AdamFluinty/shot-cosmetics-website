@@ -296,6 +296,7 @@
     </footer>
 
     <script src="../js/main.js"></script>
+    <script src="../js/api.js?v=4"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const tabsContainer = document.getElementById('tabs-container');
@@ -303,9 +304,10 @@
             const contentContainer = document.getElementById('content-container');
 
             try {
-                const response = await fetch('../assets/data/products_v2.json?v=' + new Date().getTime());
-                const data = await response.json();
-                const categories = data.categories;
+                // Fetch categories from Strapi API
+                const categories = await StrapiAPI.fetchCategories();
+                // Pre-fetch all subcategories for mapping
+                const allSubcategories = await StrapiAPI.fetchSubcategories();
 
                 if (!categories || categories.length === 0) {
                     contentContainer.innerHTML = '<p class="text-center">Brak produktów.</p>';
@@ -313,51 +315,39 @@
                 }
 
                 // Deep Linking Logic - DEBUGGING
-                console.log('Window Location Search:', window.location.search);
                 const urlParams = new URLSearchParams(window.location.search);
                 const catParam = urlParams.get('cat');
                 const subParam = urlParams.get('sub');
-                console.log('Parsed catParam:', catParam);
-                console.log('Available Categories:', categories.map(c => c.id));
 
                 // Determine Active Category
                 let activeCategory = categories[0];
                 if (catParam) {
-                    const foundCat = categories.find(c => c.id === catParam);
-                    if (foundCat) {
-                        activeCategory = foundCat;
-                        console.log('Found Active Category:', activeCategory.name);
-                    } else {
-                        console.warn('Category NOT found for ID:', catParam);
-                    }
-                } else {
-                    console.log('No catParam. Defaulting to:', activeCategory.name);
+                    const foundCat = categories.find(c => c.slug === catParam);
+                    if (foundCat) activeCategory = foundCat;
                 }
 
                 // Render Tabs
                 tabsContainer.innerHTML = '';
-                categories.forEach((cat, index) => {
+                categories.forEach(cat => {
                     const btn = document.createElement('button');
-                    btn.className = `category-tab ${cat.id === activeCategory.id ? 'active' : ''}`;
+                    btn.className = `category-tab ${cat.slug === activeCategory.slug ? 'active' : ''}`;
                     btn.textContent = cat.name;
                     btn.onclick = () => {
-                        switchCategory(cat.id);
-                        // Update URL without reload
+                        switchCategory(cat.slug);
                         const newUrl = new URL(window.location);
-                        newUrl.searchParams.set('cat', cat.id);
-                        newUrl.searchParams.delete('sub'); // Clear sub when switching main cat
+                        newUrl.searchParams.set('cat', cat.slug);
+                        newUrl.searchParams.delete('sub');
                         window.history.pushState({}, '', newUrl);
                     };
                     tabsContainer.appendChild(btn);
                 });
 
                 // Render Initial Category
-                renderCategory(activeCategory);
+                await renderCategory(activeCategory);
 
                 // Deep Link Scroll to Subcategory
-                if (subParam && activeCategory.subcategories) {
+                if (subParam) {
                     setTimeout(() => {
-                        // Wait for DOM to render
                         const subIdx = parseInt(subParam);
                         const targetBtn = subTabsContainer.children[subIdx];
                         if (targetBtn) targetBtn.click();
@@ -365,29 +355,31 @@
                 }
 
                 // Tab Switch Logic
-                window.switchCategory = (id) => {
-                    // Update Active Tab
+                window.switchCategory = async (slug) => {
                     document.querySelectorAll('.category-tab').forEach(tab => {
-                        if (tab.textContent === categories.find(c => c.id === id).name) {
-                            tab.classList.add('active');
-                        } else {
-                            tab.classList.remove('active');
-                        }
+                        const cat = categories.find(c => c.name === tab.textContent);
+                        tab.classList.toggle('active', cat && cat.slug === slug);
                     });
-
-                    const cat = categories.find(c => c.id === id);
-                    renderCategory(cat);
+                    const cat = categories.find(c => c.slug === slug);
+                    await renderCategory(cat);
                 };
 
-                function renderCategory(cat) {
-                    contentContainer.innerHTML = '';
-                    subTabsContainer.innerHTML = ''; // Clear sub-tabs
+                async function renderCategory(cat) {
+                    contentContainer.innerHTML = '<div class="text-center" style="padding: 4rem 0;"><p style="color: var(--color-text-muted);">Ładowanie produktów...</p></div>';
+                    subTabsContainer.innerHTML = '';
                     subTabsContainer.classList.remove('visible');
 
+                    // Fetch subcategories & products for this category from API
+                    const catSubcategories = allSubcategories.filter(s => s.category && s.category.slug === cat.slug);
+                    let catProducts = [];
+                    if (catSubcategories.length === 0) {
+                        catProducts = await StrapiAPI.fetchProductsByCategory(cat.slug);
+                    }
+
+                    contentContainer.innerHTML = '';
                     const section = document.createElement('div');
                     section.className = 'category-section';
 
-                    // Title & Description
                     const headerHTML = `
                         <div class="text-center" style="margin-bottom: 3rem;">
                             <h2 style="color: var(--color-purple-dark); margin-bottom: 0.5rem;">${cat.name}</h2>
@@ -397,133 +389,51 @@
                     `;
                     section.innerHTML = headerHTML;
 
-                    // Check content type: Simple Products or Nested Subcategories
-                    if (cat.products && cat.products.length > 0) {
-                        // Simple Product Grid
-                        section.innerHTML += renderProductGrid(cat.products);
-                    } else if (cat.subcategories && cat.subcategories.length > 0) {
+                    if (catProducts.length > 0) {
+                        section.innerHTML += renderProductGrid(catProducts);
+                    } else if (catSubcategories.length > 0) {
                         // Render Sub-Tabs
                         subTabsContainer.classList.add('visible');
 
-                        cat.subcategories.forEach((sub, idx) => {
-                            // Sub-Tab Button
+                        catSubcategories.forEach((sub, idx) => {
                             const subBtn = document.createElement('button');
                             subBtn.className = 'sub-tab';
-                            // Shorten very long names for tabs aesthetics, or keep nicely formatted
-                            // E.g. "COLOR CARE..." -> "COLOR CARE"
-                            // Take first 3 words max
                             const shortName = sub.name.split(' ').slice(0, 3).join(' ') + (sub.name.split(' ').length > 3 ? '...' : '');
-
                             subBtn.textContent = shortName;
-                            subBtn.title = sub.name; // Full name on hover
+                            subBtn.title = sub.name;
 
                             subBtn.onclick = () => {
                                 const target = document.getElementById(`sub-${idx}`);
                                 if (target) {
-                                    // Compensate for sticky headers (approx 180px)
                                     const y = target.getBoundingClientRect().top + window.scrollY - 180;
                                     window.scrollTo({ top: y, behavior: 'smooth' });
-
-                                    // Update active state
                                     document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
                                     subBtn.classList.add('active');
                                 }
                             };
                             subTabsContainer.appendChild(subBtn);
 
-                            // Section Content
                             const subSection = document.createElement('div');
-                            subSection.id = `sub-${idx}`; // anchor
+                            subSection.id = `sub-${idx}`;
                             subSection.style.marginTop = '2rem';
                             subSection.style.marginBottom = '4rem';
 
-                            // Check for Tricoilogy level nesting (3rd Level)
-                            if (sub.subcategories && sub.subcategories.length > 0) {
-                                // Header
-                                const headerDiv = document.createElement('div');
-                                headerDiv.className = 'subsection-header';
-                                headerDiv.innerHTML = `
-                                        <h3 class="subsection-title">${sub.name}</h3>
-                                        ${sub.description ? `<span class="subsection-desc">${sub.description}</span>` : ''}
-                                    `;
-                                subSection.appendChild(headerDiv);
-
-                                // 3rd Level Tabs Container
-                                const deepTabsContainer = document.createElement('div');
-                                deepTabsContainer.style.display = 'flex';
-                                deepTabsContainer.style.justifyContent = 'center';
-                                deepTabsContainer.style.gap = '1rem';
-                                deepTabsContainer.style.flexWrap = 'wrap';
-                                deepTabsContainer.style.marginBottom = '2rem';
-                                subSection.appendChild(deepTabsContainer);
-
-                                // Container for 3rd level content
-                                const deepContentContainer = document.createElement('div');
-                                subSection.appendChild(deepContentContainer);
-
-                                // Logic to handle tab switching
-                                let activeDeepIndex = 0;
-
-                                sub.subcategories.forEach((deepSub, deepIdx) => {
-                                    // Create Tab Button
-                                    const deepBtn = document.createElement('button');
-                                    deepBtn.textContent = deepSub.name;
-                                    deepBtn.className = 'btn btn-outline'; // Reuse existing styles
-                                    deepBtn.style.fontSize = '0.8rem';
-                                    deepBtn.style.padding = '0.5rem 1rem';
-                                    deepBtn.style.borderColor = activeDeepIndex === deepIdx ? 'var(--color-purple)' : '#ddd';
-                                    deepBtn.style.color = activeDeepIndex === deepIdx ? 'var(--color-purple)' : 'var(--color-text)';
-                                    deepBtn.style.backgroundColor = activeDeepIndex === deepIdx ? '#f3f0f7' : 'transparent';
-
-                                    // Create Content Div
-                                    const deepContentDiv = document.createElement('div');
-                                    deepContentDiv.style.display = activeDeepIndex === deepIdx ? 'block' : 'none';
-                                    deepContentDiv.innerHTML = `
-                                            <h4 style="color: var(--color-purple); font-family: var(--font-heading); font-size: 1.2rem; margin-bottom: 2rem; text-align: center; display: none;">${deepSub.name}</h4>
-                                            ${renderProductGrid(deepSub.products)}
-                                        `;
-                                    deepContentContainer.appendChild(deepContentDiv);
-
-                                    // Click Handler
-                                    deepBtn.onclick = () => {
-                                        // Update active index
-                                        activeDeepIndex = deepIdx;
-
-                                        // 1. Update Tabs Visuals
-                                        Array.from(deepTabsContainer.children).forEach((btn, i) => {
-                                            const isActive = i === deepIdx;
-                                            btn.style.borderColor = isActive ? 'var(--color-purple)' : '#ddd';
-                                            btn.style.color = isActive ? 'var(--color-purple)' : 'var(--color-text)';
-                                            btn.style.backgroundColor = isActive ? '#f3f0f7' : 'transparent';
-                                        });
-
-                                        // 2. Show/Hide Content
-                                        Array.from(deepContentContainer.children).forEach((div, i) => {
-                                            div.style.display = i === deepIdx ? 'block' : 'none';
-                                        });
-                                    };
-
-                                    deepTabsContainer.appendChild(deepBtn);
-                                });
-
-                            } else {
-                                // Standard Subcategory (e.g., Color Care)
-                                subSection.innerHTML = `
-                                    <div class="subsection-header" style="text-align: center; margin-bottom: 3rem; position: relative; padding: 2rem; background: #fafafa; border-radius: 8px;">
-                                        <h3 class="subsection-title" style="color: var(--color-purple); font-size: 1.8rem; margin-bottom: 1rem;">${sub.name}</h3>
-                                        ${sub.description ? `
-                                            <div style="max-width: 800px; margin: 0 auto; position: relative;">
-                                                <span style="font-size: 3rem; line-height: 1; position: absolute; top: -1rem; left: -1rem; color: var(--color-gold); opacity: 0.3;">"</span>
-                                                <p class="subsection-desc" style="font-size: 1.1rem; line-height: 1.6; color: var(--color-text-light); font-style: italic; position: relative; z-index: 1;">
-                                                    ${sub.description}
-                                                </p>
-                                                <span style="font-size: 3rem; line-height: 1; position: absolute; bottom: -2rem; right: -1rem; color: var(--color-gold); opacity: 0.3;">"</span>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                    ${renderProductGrid(sub.products)}
-                                `;
-                            }
+                            // Standard Subcategory with products
+                            subSection.innerHTML = `
+                                <div class="subsection-header" style="text-align: center; margin-bottom: 3rem; position: relative; padding: 2rem; background: #fafafa; border-radius: 8px;">
+                                    <h3 class="subsection-title" style="color: var(--color-purple); font-size: 1.8rem; margin-bottom: 1rem;">${sub.name}</h3>
+                                    ${sub.description ? `
+                                        <div style="max-width: 800px; margin: 0 auto; position: relative;">
+                                            <span style="font-size: 3rem; line-height: 1; position: absolute; top: -1rem; left: -1rem; color: var(--color-gold); opacity: 0.3;">"</span>
+                                            <p class="subsection-desc" style="font-size: 1.1rem; line-height: 1.6; color: var(--color-text-light); font-style: italic; position: relative; z-index: 1;">
+                                                ${sub.description}
+                                            </p>
+                                            <span style="font-size: 3rem; line-height: 1; position: absolute; bottom: -2rem; right: -1rem; color: var(--color-gold); opacity: 0.3;">"</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                ${renderProductGrid(sub.products || [])}
+                            `;
                             section.appendChild(subSection);
                         });
                     }

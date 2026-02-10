@@ -1,77 +1,160 @@
-// Config for Static or Local mode
-const USE_STATIC_DATA = true; // Set to true for Netlify deployment
-const API_URL = 'http://localhost:1337';
+/**
+ * Shot Cosmetics — Strapi API Client
+ * Connects to the live Strapi CMS on Railway
+ */
+
+const STRAPI_URL = 'https://hairpassion-production.up.railway.app';
+const API = `${STRAPI_URL}/api`;
 
 /**
- * Helper to get full image URL
+ * Generic fetch helper with error handling and caching
+ */
+const _cache = {};
+async function strapiFetch(endpoint) {
+    if (_cache[endpoint]) return _cache[endpoint];
+    try {
+        const response = await fetch(`${API}${endpoint}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const json = await response.json();
+        _cache[endpoint] = json.data;
+        return json.data;
+    } catch (error) {
+        console.error(`[StrapiAPI] Error fetching ${endpoint}:`, error);
+        return null;
+    }
+}
+
+/**
+ * Get full image URL from Strapi media object
  */
 function getImageUrl(imageData) {
-    if (!imageData) return 'assets/images/product_purple.png'; // Fallback
+    if (!imageData) return null;
+    const url = imageData.formats?.medium?.url || imageData.formats?.small?.url || imageData.url;
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${STRAPI_URL}${url}`;
+}
 
-    const url = imageData.formats?.small?.url || imageData.url;
+// ─── PRODUCTS & CATEGORIES ────────────────────────────────────────
 
-    if (USE_STATIC_DATA) {
-        // In static mode, we replaced /uploads/ with assets/uploads/ in our JSON export
-        // However, if the JSON still has the raw path from export script, we might handle it here too
-        // But our export script kept the path as is? Wait, the export script had cleanData() but didn't actually use it on the values recursively.
-        // Let's assume the JSON has raw paths "/uploads/foo.png".
-        // We need to strip the domain and map to local assets.
-        return `/assets${url}`;
-        // Note: The export script didn't recursively clean the JSON, so paths are likely "/uploads/file.png".
-        // We want "assets/uploads/file.png".
+async function fetchCategories() {
+    const data = await strapiFetch('/product-categories?sort=sort_order:asc');
+    return data || [];
+}
+
+async function fetchSubcategories(categorySlug) {
+    const data = await strapiFetch(`/product-subcategories?populate=products&populate=category&pagination[pageSize]=100&sort=sort_order:asc`);
+    if (!data) return [];
+    if (categorySlug) {
+        return data.filter(s => s.category && s.category.slug === categorySlug);
     }
+    return data;
+}
 
-    return `${API_URL}${url}`;
+async function fetchProductsByCategory(categorySlug) {
+    const data = await strapiFetch(`/products?populate=category&pagination[pageSize]=100&sort=sort_order:asc&filters[category][slug][$eq]=${categorySlug}`);
+    return data || [];
+}
+
+async function fetchAllProducts() {
+    const data = await strapiFetch('/products?populate=category&pagination[pageSize]=100&sort=sort_order:asc');
+    return data || [];
 }
 
 /**
- * Fetch all categories with their products
+ * Fetch full category data with products organized by subcategories
+ * Returns: { category, products, subcategories: [{ ...sub, products: [...] }] }
  */
-async function fetchCategoriesWithProducts() {
-    try {
-        const url = USE_STATIC_DATA ? '/assets/data/categories.json' : `${API_URL}/api/categories?populate[products][populate]=image&sort=order:asc`;
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.data; // Strapi format { data: [...] }
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-        return [];
+async function fetchCategoryFull(categorySlug) {
+    const [categories, subcategories, products] = await Promise.all([
+        fetchCategories(),
+        fetchSubcategories(categorySlug),
+        fetchProductsByCategory(categorySlug)
+    ]);
+
+    const category = categories.find(c => c.slug === categorySlug);
+
+    if (subcategories.length > 0) {
+        // Category with subcategories (like Pielęgnacja)
+        return { category, products: [], subcategories };
+    } else {
+        // Category with direct products (like Koloryzacja)
+        return { category, products, subcategories: [] };
     }
 }
 
-/**
- * Fetch all products
- */
-async function fetchProducts() {
-    try {
-        const url = USE_STATIC_DATA ? '/assets/data/products.json' : `${API_URL}/api/products?populate=*`;
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.data;
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        return [];
-    }
+// ─── NEWS ARTICLES ────────────────────────────────────────────────
+
+async function fetchArticles(limit) {
+    const qs = limit ? `&pagination[limit]=${limit}` : '&pagination[pageSize]=100';
+    const data = await strapiFetch(`/news-articles?populate=*&sort=published_date:desc${qs}`);
+    return data || [];
 }
 
-/**
- * Fetch articles
- */
-async function fetchArticles() {
-    try {
-        const url = USE_STATIC_DATA ? '/assets/data/articles.json' : `${API_URL}/api/articles?populate=*&sort=publishedAt:desc`;
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.data;
-    } catch (error) {
-        console.error('Error fetching articles:', error);
-        return [];
-    }
+async function fetchArticleBySlug(slug) {
+    const data = await strapiFetch(`/news-articles?filters[slug][$eq]=${slug}&populate=*`);
+    return data && data.length > 0 ? data[0] : null;
 }
+
+// ─── EDUCATION ────────────────────────────────────────────────────
+
+async function fetchEducationEvents() {
+    const data = await strapiFetch('/education-events?populate=*&sort=date:asc');
+    return data || [];
+}
+
+async function fetchEducators() {
+    const data = await strapiFetch('/educators?populate=*');
+    return data || [];
+}
+
+async function fetchEducationPage() {
+    return await strapiFetch('/education-page?populate=*');
+}
+
+// ─── DISTRIBUTORS ─────────────────────────────────────────────────
+
+async function fetchDistributors() {
+    const data = await strapiFetch('/regional-distributors?populate[representatives]=*&pagination[pageSize]=100');
+    return data || [];
+}
+
+// ─── SINGLE TYPES (Page Content) ─────────────────────────────────
+
+async function fetchHomepageHero() {
+    return await strapiFetch('/homepage-hero?populate=*');
+}
+
+async function fetchHomepageAbout() {
+    return await strapiFetch('/homepage-about?populate[stats]=*&populate[image]=*');
+}
+
+async function fetchAboutPage() {
+    return await strapiFetch('/about-page?populate[values]=*');
+}
+
+async function fetchContactInfo() {
+    return await strapiFetch('/contact-info?populate=*');
+}
+
+// ─── EXPORT ───────────────────────────────────────────────────────
 
 window.StrapiAPI = {
+    STRAPI_URL,
     getImageUrl,
-    fetchCategoriesWithProducts,
-    fetchProducts,
-    fetchArticles
+    fetchCategories,
+    fetchSubcategories,
+    fetchProductsByCategory,
+    fetchAllProducts,
+    fetchCategoryFull,
+    fetchArticles,
+    fetchArticleBySlug,
+    fetchEducationEvents,
+    fetchEducators,
+    fetchEducationPage,
+    fetchDistributors,
+    fetchHomepageHero,
+    fetchHomepageAbout,
+    fetchAboutPage,
+    fetchContactInfo
 };
