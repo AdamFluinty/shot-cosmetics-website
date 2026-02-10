@@ -123,13 +123,13 @@ async function fetchEducators() {
 }
 
 async function fetchEducationPage() {
-    return await strapiFetch('/education-page?populate[hero_image]=*&populate[program_image]=*&populate[program_features]=*');
+    return await strapiFetch('/education-page?populate[0]=hero_image&populate[1]=program_image&populate[2]=program_features');
 }
 
 // ─── DISTRIBUTORS ─────────────────────────────────────────────────
 
 async function fetchDistributors() {
-    const data = await strapiFetch('/regional-distributors?populate[representatives]=*&pagination[pageSize]=100');
+    const data = await strapiFetch('/regional-distributors?populate[0]=representatives&pagination[pageSize]=100');
     return data || [];
 }
 
@@ -140,11 +140,11 @@ async function fetchHomepageHero() {
 }
 
 async function fetchHomepageAbout() {
-    return await strapiFetch('/homepage-about?populate[stats]=*&populate[image]=*');
+    return await strapiFetch('/homepage-about?populate[0]=stats&populate[1]=image');
 }
 
 async function fetchAboutPage() {
-    return await strapiFetch('/about-page?populate[history_image]=*&populate[hero_image]=*&populate[values][populate][icon]=*');
+    return await strapiFetch('/about-page?populate[0]=history_image&populate[1]=hero_image&populate[2]=values&populate[3]=values.icon');
 }
 
 async function fetchContactInfo() {
