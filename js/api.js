@@ -48,7 +48,9 @@ async function fetchCategories() {
 }
 
 async function fetchSubcategories(categorySlug) {
-    const data = await strapiFetch(`/product-subcategories?populate=products&populate=category&pagination[pageSize]=100&sort=sort_order:asc`);
+    // Deep populate products explicitly to get images
+    const query = `populate[products][populate][0]=image&populate[category]=true&pagination[pageSize]=100&sort=sort_order:asc`;
+    const data = await strapiFetch(`/product-subcategories?${query}`);
     if (!data) return [];
     if (categorySlug) {
         return data.filter(s => s.category && s.category.slug === categorySlug);
@@ -57,21 +59,21 @@ async function fetchSubcategories(categorySlug) {
 }
 
 async function fetchProductsByCategory(categorySlug) {
-    const data = await strapiFetch(`/products?populate=category&pagination[pageSize]=100&sort=sort_order:asc&filters[category][slug][$eq]=${categorySlug}`);
+    const data = await strapiFetch(`/products?populate=*&pagination[pageSize]=100&sort=sort_order:asc&filters[category][slug][$eq]=${categorySlug}`);
     return data || [];
 }
 
 async function fetchAllProducts() {
-    const data = await strapiFetch('/products?populate=category&pagination[pageSize]=100&sort=sort_order:asc');
+    const data = await strapiFetch('/products?populate=*&pagination[pageSize]=100&sort=sort_order:asc');
     return data || [];
 }
 
 async function fetchBestsellers(limit = 3) {
     // Try bestsellers first
-    let data = await strapiFetch(`/products?populate=category&populate=image&filters[is_bestseller][$eq]=true&pagination[limit]=${limit}&sort=sort_order:asc`);
+    let data = await strapiFetch(`/products?populate=*&filters[is_bestseller][$eq]=true&pagination[limit]=${limit}&sort=sort_order:asc`);
     if (data && data.length > 0) return data;
     // Fallback: return first N products
-    data = await strapiFetch(`/products?populate=category&populate=image&pagination[limit]=${limit}&sort=sort_order:asc`);
+    data = await strapiFetch(`/products?populate=*&pagination[limit]=${limit}&sort=sort_order:asc`);
     return data || [];
 }
 

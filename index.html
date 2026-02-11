@@ -517,19 +517,32 @@
             if (!products || products.length === 0) return;
             const grid = document.getElementById('bestsellers-grid');
             grid.innerHTML = products.map(p => {
-                const imgUrl = StrapiAPI.getImageUrl(p.image);
-                const categoryName = p.category?.name || '';
-                return `
-                    <div class="card" style="padding: 3rem 2rem; text-align: center;">
-                        <div style="height: 250px; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
-                            <img src="${imgUrl || 'assets/images/product_purple.png'}" style="max-height: 100%; object-fit: contain;" alt="${p.name}">
+                const renderProductCard = (product) => {
+                    const name = product.name;
+                    // Use dynamic image if available, else fallback
+                    let imgSrc = 'assets/images/product_purple.png';
+                    let imgStyle = 'max-height: 80%; opacity: 0.8; mix-blend-mode: multiply;';
+                    if (product.image) {
+                        const url = StrapiAPI.getImageUrl(product.image);
+                        if (url) {
+                            imgSrc = url;
+                            imgStyle = 'max-height: 90%; opacity: 1; mix-blend-mode: normal; object-fit: contain;';
+                        }
+                    }
+
+                    return `
+                    <div class="card" style="padding: 2rem; text-align: center; transition: all 0.3s ease; background: white; border: 1px solid rgba(0,0,0,0.05);">
+                        <div style="height: 180px; background: #fafafa; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; border-radius: 4px;">
+                            <img src="${imgSrc}"
+                                 alt="${name}"
+                                 style="${imgStyle}" loading="lazy">
                         </div>
-                        <span class="text-uppercase" style="font-size: 0.65rem; color: var(--color-text-muted); margin-bottom: 0.5rem; display: block;">${categoryName}</span>
-                        <h4 style="font-size: 1.4rem; margin-bottom: 1rem;">${p.name}</h4>
-                        <p style="color: var(--color-text-light); font-size: 0.95rem; margin-bottom: 0.5rem;">${p.description || ''}</p>
-                        ${p.capacity ? `<span style="font-size: 0.8rem; color: var(--color-gold); font-weight: 600;">${p.capacity}</span>` : ''}
+                        <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--color-text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; min-height: 2.5em; display: flex; align-items: center; justify-content: center;">${name}</h4>
+                        <a href="pages/products.html" class="btn-text" style="font-size: 0.8rem; color: var(--color-gold);">Zobacz więcej</a>
                     </div>
-                `;
+                    `;
+                };
+                return renderProductCard(p);
             }).join('');
             // Reveal bestsellers section
             document.getElementById('bestsellers-section').style.opacity = '1';

@@ -472,7 +472,7 @@
 
                     const gridHTML = products.map(product => {
                         const name = typeof product === 'string' ? product : product.name;
-                        const desc = typeof product === 'string' ? 'Zobacz więcej' : product.desc;
+                        const desc = typeof product === 'string' ? 'Zobacz więcej' : (product.desc || product.description || '');
                         const capacity = (typeof product !== 'string' && product.capacity) ? `<span style="display: block; font-size: 0.7rem; color: var(--color-gold); margin-top: 0.5rem; font-weight: 600;">${product.capacity}</span>` : '';
 
                         let imgSrc = '../assets/images/product_purple.png';
