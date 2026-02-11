@@ -217,17 +217,41 @@
             border-radius: 8px;
             border: 1px solid #eee;
         }
+
+        /* Products hero mobile */
+        @media (max-width: 768px) {
+            .products-hero-content {
+                flex-direction: column !important;
+                padding: 0 1.5rem !important;
+                gap: 2rem !important;
+                text-align: center !important;
+            }
+
+            .products-hero-content>div {
+                text-align: center !important;
+            }
+
+            .products-hero-content h1 {
+                font-size: 2.5rem !important;
+            }
+
+            .products-hero-content p {
+                max-width: 100% !important;
+            }
+
+            .products-hero-img-wrap {
+                max-width: 100% !important;
+            }
+        }
     </style>
 
 
     <main>
         <!-- Hero Section -->
-        <!-- Hero Section -->
-        <!-- Hero Section -->
         <section class="hero"
-            style="min-height: 50vh; background: var(--color-purple-dark); margin-top: 4rem; display: flex; align-items: center; padding: 4rem 0;">
+            style="min-height: 50vh; background: var(--color-purple-dark); margin-top: 4rem; display: flex; align-items: center; justify-content: center; padding: 6rem 0;">
             <div class="hero-overlay"></div>
-            <div class="container hero-content"
+            <div class="container hero-content products-hero-content"
                 style="max-width: 1800px; padding: 0 6rem; display: flex; align-items: center; gap: 6rem; z-index: 2; position: relative; opacity: 0; transition: opacity 0.5s ease;">
 
                 <!-- Text Column -->
@@ -243,7 +267,8 @@
 
                 <!-- Image Column -->
                 <div style="flex: 1; display: flex; justify-content: flex-end;">
-                    <div style="position: relative; width: 100%; max-width: 700px; aspect-ratio: 16/9;">
+                    <div class="products-hero-img-wrap"
+                        style="position: relative; width: 100%; max-width: 700px; aspect-ratio: 16/9;">
                         <!-- Decorative Frame -->
                         <div
                             style="position: absolute; top: 20px; right: -20px; width: 100%; height: 100%; border: 2px solid var(--color-gold); opacity: 0.3; border-radius: 8px;">
