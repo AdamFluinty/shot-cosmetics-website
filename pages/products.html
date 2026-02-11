@@ -12,6 +12,24 @@
 </head>
 
 <body>
+    <div id="page-loader"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+        <div class="loader-spinner"
+            style="border: 4px solid #f3f3f3; border-top: 4px solid var(--color-gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;">
+        </div>
+    </div>
+    <style>
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
     <header>
         <div class="container">
             <nav>
@@ -503,34 +521,67 @@
                     return `<div class="products-grid">${gridHTML}</div>`;
                 }
 
+                // Hero loading function
+                async function loadHero() {
+                    const page = await StrapiAPI.fetchProductsPage();
+                    if (!page) return;
+                    if (page.section_label) document.getElementById('products-hero-label').textContent = page.section_label;
+                    if (page.hero_title) document.getElementById('products-hero-title').innerHTML = page.hero_title.replace(/\n/g, '<br>');
+                    if (page.hero_description) document.getElementById('products-hero-desc').textContent = page.hero_description;
+                    if (page.hero_image) {
+                        const imgUrl = StrapiAPI.getImageUrl(page.hero_image);
+                        if (imgUrl) document.getElementById('products-hero-img').src = imgUrl;
+                    }
+                    // Reveal hero content with fade
+                    const heroContent = document.querySelector('.hero-content');
+                    if (heroContent) heroContent.style.opacity = '1';
+                }
+
+                // Execute all loads
+                await Promise.all([
+                    (async () => {
+                        if (categorySlug) {
+                            // Load specific category
+                            const link = document.querySelector(`.dropdown-menu a[href*="cat=${categorySlug}"]`);
+                            if (link) activateMenu(link);
+
+                            // Handle submenu if present
+                            if (subcategoryIndex !== null) {
+                                const subLink = document.querySelector(`.submenu a[href*="sub=${subcategoryIndex}"]`);
+                                if (subLink) subLink.classList.add('active');
+                            }
+
+                            await loadCategoryProducts(categorySlug, subcategoryIndex);
+                        } else {
+                            // Load all products
+                            await loadAllProducts();
+                        }
+                    })(),
+                    loadHero()
+                ]);
+
             } catch (err) {
                 console.error(err);
                 contentContainer.innerHTML = '<p class="text-center" style="color: red;">Wystąpił błąd podczas ładowania produktów.</p>';
+            } finally {
+                const loader = document.getElementById('page-loader');
+                if (loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 500);
+                }
             }
         });
-    </script>
-    <script src="../js/main.js?v=3"></script>
-    <script src="../js/ui-enhancements.js?v=2"></script>
-    <script>
-        // Load products page hero from CMS
-        (async function () {
-            const page = await StrapiAPI.fetchProductsPage();
-            if (!page) return;
-            if (page.section_label) document.getElementById('products-hero-label').textContent = page.section_label;
-            if (page.hero_title) document.getElementById('products-hero-title').innerHTML = page.hero_title.replace(/\n/g, '<br>');
-            if (page.hero_description) document.getElementById('products-hero-desc').textContent = page.hero_description;
-            if (page.hero_image) {
-                const imgUrl = StrapiAPI.getImageUrl(page.hero_image);
-                if (imgUrl) document.getElementById('products-hero-img').src = imgUrl;
-            }
-            // Reveal hero content with fade
-            document.querySelector('.hero-content').style.opacity = '1';
-        })();
 
         // Safety timeout: reveal hero even if CMS is slow
+        // Safety timeout
         setTimeout(() => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
             document.querySelectorAll('.hero-content').forEach(el => el.style.opacity = '1');
-        }, 3000);
+        }, 5000);
     </script>
 </body>
 
