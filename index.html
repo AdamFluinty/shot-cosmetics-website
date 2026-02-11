@@ -486,7 +486,13 @@
                     el.style.backgroundImage = `url('${imgUrl}')`;
                     el.style.backgroundPosition = 'center top';
                     el.style.backgroundSize = 'cover';
+                } else {
+                    // Hide empty image placeholder
+                    document.getElementById('about-image').parentElement.style.display = 'none';
                 }
+            } else {
+                // Hide empty image placeholder
+                document.getElementById('about-image').parentElement.style.display = 'none';
             }
             // Reveal about section
             document.getElementById('about').style.opacity = '1';
